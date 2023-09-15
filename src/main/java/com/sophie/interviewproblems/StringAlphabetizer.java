@@ -28,11 +28,23 @@ public class StringAlphabetizer {
 			ArrayList<String> words = new ArrayList<String>();
 			while(inString.contains(" ")) {
 			int endex = inString.indexOf(" ");
-			words.add(inString.substring(0, endex));
+			if(!inString.substring(0, endex).equals("")) {
+				words.add(inString.substring(0, endex));
+				}
 			inString = inString.substring(endex + 1);
-			System.out.println(inString);
 		}
+			while(inString.contains(".")) {
+				int endex = inString.indexOf(".");
+				if(!inString.substring(0, endex).equals("")) {
+				words.add(inString.substring(0, endex));
+				}
+				inString = inString.substring(endex + 1);
+			}
+			
+			System.out.println(inString);
+			if(!(inString.equals(""))) {
 			words.add(inString);
+			}
 			sortedString.add(words.get(0));
 			/*
 			 * Explaining the Algorithm - 
@@ -52,22 +64,75 @@ public class StringAlphabetizer {
 			 * Since we know at each step that the list is sorted, we know the previous entry is smaller by default (or at worst, equal) if the next entry is larger. 
 			 */
 			
-			for(int i = 1; i < words.size() - 1; i++) { //Since the first element from words is already in the sorted string, we skip it here.
+			for(int i = 1; i < words.size(); i++) { //Since the first element from words is already in the sorted string, we skip it here.
 				boolean added = false;
 				for(int j = 0; j < sortedString.size(); j++) { //Check words[i] against each element in the output list.
-					if(!added && words.get(i).compareTo(sortedString.get(j)) <= 0) { //If sortedString[j] does not precede or equal words[i]...
+					if(!added && words.get(i).compareTo(sortedString.get(j)) <= 0 && j != sortedString.size() - 1) { //If sortedString[j] does not precede or equal words[i]...
 						 sortedString.add(j, words.get(i));
 						 added = true;
-						 System.out.println(words.toString());
-						 System.out.println(sortedString.toString());
+						 //System.out.println(words.toString());
+						 //System.out.println(sortedString.toString());
 						 continue;
 					}
-					if(!added && j == sortedString.size() - 1) { //If the new entry doesn't precede or coincide with anything in the list, add it at the end.
+					else if(!added && j == sortedString.size() - 1) { //If the new entry doesn't precede or coincide with anything in the list, add it at the end.
+						//System.out.println("Add at end!");
+						added = true;
 						sortedString.add(words.get(i));
+						//System.out.println(sortedString.toString());
+						continue;
+					}
+					
+					else if(!added && j != sortedString.size() - 1 && words.get(i).compareTo(sortedString.get(j)) > 0) {
+						continue;
 					}
 				}
 			}
 			System.out.println("Sort completed! Results: " + sortedString.toString());
+			System.out.println("Entering validation step!");
+			System.out.println("Input string: " + inString);
+			System.out.println("Output string: " + sortedString.toString());
+			
+			TreeMap<String, Integer> inMap = new TreeMap<String, Integer>();
+			for(int i = 0; i < words.size(); i++) {
+				String treeIn = String.valueOf(words.get(i));
+				if(inMap.containsKey(treeIn)) {
+					int inCount = inMap.get(treeIn); 
+					inMap.replace(treeIn, inCount, inCount + 1);
+				} else {
+					inMap.put(treeIn, 1);
+				}
+			}
+			inMap.remove(" ");
+			inMap.remove(",");
+			inMap.remove("[");
+			inMap.remove("]");
+			inMap.remove(".");
+			String inMapString = inMap.toString();
+			System.out.println("String composition calculated for input, results are as follows - " + inMapString);
+			
+			TreeMap<String, Integer> outMap = new TreeMap<String, Integer>();
+			for(int i = 0; i < sortedString.size(); i++) {
+				String treeOut = String.valueOf(sortedString.get(i));
+				if(outMap.containsKey(treeOut)) {
+					int outCount = outMap.get(treeOut); 
+					outMap.replace(treeOut, outCount, outCount + 1);
+				} else {
+					outMap.put(treeOut, 1);
+				}
+			}
+			outMap.remove(" ");
+			outMap.remove(",");
+			outMap.remove("[");
+			outMap.remove("]");
+			outMap.remove(".");
+			String outMapString = outMap.toString();
+			System.out.println("String composition calculated for output, results are as follows - " + outMapString);
+			
+			if(inMap.equals(outMap)) {
+				System.out.println("Validated! The input and output contain the same set of key-value pairs.");
+			} else {
+				System.out.println("Validation failed! There is a mismatch between the key-value pairs from the input and output.");
+			}
 		}
 		
 		else if(modeSetting.equalsIgnoreCase("string")) {
@@ -98,7 +163,7 @@ public class StringAlphabetizer {
 					}
 					
 					else if(!added && letters.get(i).compareTo(sortedChars.get(j)) <= 0 && j != sortedChars.size() - 1) { //If sortedString[j] does not precede or equal words[i]...
-						System.out.println("Add at " + j);
+						//System.out.println("Add at " + j);
 						sortedChars.add(j, letters.get(i));
 						added = true;
 						System.out.println(sortedChars.toString());
@@ -106,7 +171,7 @@ public class StringAlphabetizer {
 					}
 					
 					else if(!added && j == sortedChars.size() - 1) { //If the new entry doesn't precede or coincide with anything in the list, add it at the end.
-						System.out.println("Add at end!");
+						//System.out.println("Add at end!");
 						added = true;
 						sortedChars.add(letters.get(i));
 						System.out.println(sortedChars.toString());
@@ -149,8 +214,6 @@ public class StringAlphabetizer {
 				} else {
 					outMap.put(treeOut, 1);
 				}
-				//System.out.println("Current state of output: " + outMap.toString());
-				//System.out.println("Current unprocessed input: " + sortedChars.subList(i, sortedChars.size()));
 			}
 			outMap.remove(" ");
 			outMap.remove(",");
